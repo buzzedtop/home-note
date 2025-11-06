@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:html' as html show window;
-import 'dart:io' show File;
-import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -69,42 +66,15 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  Future<String> get _localPath async {
-    if (kIsWeb) {
-      return '';
-    }
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  Future<File?> get _localFile async {
-    if (kIsWeb) {
-      return null;
-    }
-    final path = await _localPath;
-    return File('$path/notes.json');
-  }
-
   Future<void> _loadNotes() async {
     try {
-      if (kIsWeb) {
-        // Use local storage for web
-        final jsonString = html.window.localStorage['notes'];
-        if (jsonString != null && jsonString.isNotEmpty) {
-          final List<dynamic> jsonData = json.decode(jsonString);
-          setState(() {
-            _notes = jsonData.map((item) => Note.fromJson(item)).toList();
-          });
-        }
-      } else {
-        final file = await _localFile;
-        if (file != null && await file.exists()) {
-          final contents = await file.readAsString();
-          final List<dynamic> jsonData = json.decode(contents);
-          setState(() {
-            _notes = jsonData.map((item) => Note.fromJson(item)).toList();
-          });
-        }
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = prefs.getString('notes');
+      if (jsonString != null && jsonString.isNotEmpty) {
+        final List<dynamic> jsonData = json.decode(jsonString);
+        setState(() {
+          _notes = jsonData.map((item) => Note.fromJson(item)).toList();
+        });
       }
     } catch (e) {
       // If encountering an error, return empty list
@@ -116,18 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _saveNotes() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
       final jsonData = _notes.map((note) => note.toJson()).toList();
       final jsonString = json.encode(jsonData);
-      
-      if (kIsWeb) {
-        // Use local storage for web
-        html.window.localStorage['notes'] = jsonString;
-      } else {
-        final file = await _localFile;
-        if (file != null) {
-          await file.writeAsString(jsonString);
-        }
-      }
+      await prefs.setString('notes', jsonString);
     } catch (e) {
       // Handle error
       if (mounted) {

@@ -29,9 +29,9 @@ Home Note is a Flutter web application for managing notes with drag-and-drop reo
   - Delete button (red)
 
 ##### Storage
-- **Web Platform**: Uses browser's localStorage for persistent storage
-- **Mobile/Desktop**: Uses JSON file via path_provider package
-- Data format: JSON array of note objects
+- **All Platforms**: Uses `shared_preferences` package for persistent storage
+- Works seamlessly on Web (localStorage), iOS (NSUserDefaults), Android (SharedPreferences), and Desktop
+- Data format: JSON string stored in preferences
 
 ### Data Model
 
