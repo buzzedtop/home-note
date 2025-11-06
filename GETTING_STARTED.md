@@ -4,47 +4,80 @@ This guide will help you get the Home Note application up and running.
 
 ## Prerequisites
 
-### For Docker Deployment (Recommended)
-- Docker 20.10 or higher
-- Docker Compose (optional, but convenient)
+### For Container Deployment (Recommended)
+
+Choose one of these container runtimes (**Docker Desktop NOT required**):
+
+- **Podman** (Recommended - works on all platforms)
+- **OrbStack** (macOS only - fastest)
+- **Rancher Desktop** (all platforms)
+- **Colima** (macOS only)
+- **Docker** (if you already have it)
+
+See **[Container Setup Guide](CONTAINER_SETUP.md)** for detailed installation instructions.
 
 ### For Local Development
 - Flutter SDK 3.0 or higher
 - Dart SDK 3.0 or higher
 - A web browser (Chrome recommended)
 
-## Quick Start with Docker
+## Quick Start with Containers
 
-### Option 1: Using Docker Compose (Easiest)
+### Option 1: Using Auto-Detection Scripts (Easiest) ⭐
+
+Works with Docker, Podman, OrbStack, Rancher Desktop, and Colima:
 
 ```bash
 # Clone the repository
 git clone https://github.com/buzzedtop/home-note.git
 cd home-note
 
-# Start the application
-docker-compose up -d
+# Build the container image (auto-detects runtime)
+./build-container.sh
 
-# View logs
-docker-compose logs -f
-
-# Stop the application
-docker-compose down
+# Run the application (auto-detects runtime)
+./run-container.sh
 ```
 
 Access the application at: http://localhost:8080
 
-### Option 2: Using Docker CLI
+### Option 2: Using Docker/Podman Compose
+
+```bash
+# With Docker Compose
+docker-compose up -d
+
+# With Podman Compose
+podman-compose -f podman-compose.yml up -d
+
+# View logs
+docker-compose logs -f
+# or
+podman-compose logs -f
+
+# Stop the application
+docker-compose down
+# or
+podman-compose down
+```
+
+### Option 3: Using Docker/Podman CLI
 
 ```bash
 # Build the image
 docker build -t home-note:latest .
+# or
+podman build -t home-note:latest .
 
 # Run the container
 docker run -d -p 8080:8080 --name home-note home-note:latest
+# or
+podman run -d -p 8080:8080 --name home-note home-note:latest
 
 # View logs
 docker logs -f home-note
+# or
+podman logs -f home-note
 
 # Stop and remove
 docker stop home-note
