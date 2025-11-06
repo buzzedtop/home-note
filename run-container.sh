@@ -1,28 +1,45 @@
 #!/bin/bash
-# Run script compatible with Docker, Podman, and other container runtimes
+# Run script compatible with Docker, Podman, Finch, nerdctl, and other container runtimes
 
 set -e
 
 # Detect container runtime
 if command -v podman &> /dev/null; then
     RUNTIME="podman"
+elif command -v finch &> /dev/null; then
+    RUNTIME="finch"
+elif command -v nerdctl &> /dev/null; then
+    RUNTIME="nerdctl"
 elif command -v docker &> /dev/null; then
     RUNTIME="docker"
 else
-    echo "Error: No container runtime found. Please install Docker or Podman."
+    echo "Error: No container runtime found."
+    echo "Please install one of: Docker, Podman, Finch, Lima+nerdctl, OrbStack, Rancher Desktop, or Colima"
+    echo "See CONTAINER_SETUP.md for installation instructions"
     exit 1
 fi
 
 echo "Using container runtime: $RUNTIME"
 
-# Check if image exists
-if ! $RUNTIME image exists home-note:latest 2>/dev/null; then
+# Check if image exists (note: finch and nerdctl use different commands)
+IMAGE_EXISTS=false
+if [ "$RUNTIME" = "finch" ] || [ "$RUNTIME" = "nerdctl" ]; then
+    if $RUNTIME images | grep -q "home-note.*latest"; then
+        IMAGE_EXISTS=true
+    fi
+else
+    if $RUNTIME image exists home-note:latest 2>/dev/null; then
+        IMAGE_EXISTS=true
+    fi
+fi
+
+if [ "$IMAGE_EXISTS" = false ]; then
     echo "Image 'home-note:latest' not found. Building..."
     ./build-container.sh
 fi
 
 # Stop and remove existing container if running
-if $RUNTIME ps -a --format "{{.Names}}" | grep -q "^home-note-app$"; then
+if $RUNTIME ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^home-note-app$"; then
     echo "Stopping existing container..."
     $RUNTIME stop home-note-app
     $RUNTIME rm home-note-app
@@ -33,7 +50,6 @@ echo "Starting home-note container..."
 $RUNTIME run -d \
     --name home-note-app \
     -p 8080:8080 \
-    --restart unless-stopped \
     home-note:latest
 
 if [ $? -eq 0 ]; then

@@ -1,15 +1,21 @@
 #!/bin/bash
-# Build script compatible with Docker, Podman, and other container runtimes
+# Build script compatible with Docker, Podman, Finch, nerdctl, and other container runtimes
 
 set -e
 
 # Detect container runtime
 if command -v podman &> /dev/null; then
     RUNTIME="podman"
+elif command -v finch &> /dev/null; then
+    RUNTIME="finch"
+elif command -v nerdctl &> /dev/null; then
+    RUNTIME="nerdctl"
 elif command -v docker &> /dev/null; then
     RUNTIME="docker"
 else
-    echo "Error: No container runtime found. Please install Docker or Podman."
+    echo "Error: No container runtime found."
+    echo "Please install one of: Docker, Podman, Finch, Lima+nerdctl, OrbStack, Rancher Desktop, or Colima"
+    echo "See CONTAINER_SETUP.md for installation instructions"
     exit 1
 fi
 

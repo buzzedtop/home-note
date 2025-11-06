@@ -27,6 +27,24 @@ This guide covers setting up the Home Note application using various container r
    - Uses Lima VMs
    - Free and open source
 
+5. **Finch** (macOS and Linux)
+   - AWS's open-source container development tool
+   - Native Apple Silicon support
+   - Uses Lima and nerdctl
+   - Free and open source
+
+6. **Lima** (macOS and Linux)
+   - Linux virtual machines on macOS
+   - Direct containerd support
+   - More control than Colima
+   - Free and open source
+
+7. **nerdctl** (macOS via Lima/Rancher Desktop)
+   - Docker-compatible CLI for containerd
+   - Works with Lima or Rancher Desktop
+   - Advanced container features
+   - Free and open source
+
 ---
 
 ## Installation Instructions
@@ -122,6 +140,76 @@ docker ps
 
 ---
 
+### Option 5: Finch (macOS and Linux) ⭐ NEW
+
+```bash
+# macOS - Install via Homebrew
+brew install finch
+
+# Verify installation
+finch version
+
+# Run a test container
+finch run hello-world
+
+# Note: Finch uses 'finch' command, not 'docker'
+# Create alias for compatibility (optional)
+alias docker=finch
+```
+
+---
+
+### Option 6: Lima (macOS and Linux)
+
+```bash
+# macOS - Install via Homebrew
+brew install lima
+
+# Start a default instance
+limactl start
+
+# Use with nerdctl (Docker-compatible CLI)
+brew install nerdctl
+
+# Run commands in Lima VM
+lima nerdctl version
+lima nerdctl ps
+
+# Or enter the VM
+lima
+
+# Create alias for convenience
+alias docker='lima nerdctl'
+```
+
+---
+
+### Option 7: nerdctl (macOS via Lima or Rancher Desktop)
+
+**With Lima:**
+```bash
+# Install Lima and nerdctl
+brew install lima nerdctl
+
+# Start Lima
+limactl start
+
+# Use nerdctl
+lima nerdctl version
+```
+
+**With Rancher Desktop:**
+```bash
+# Install Rancher Desktop from https://rancherdesktop.io/
+# Select 'containerd' as runtime
+# nerdctl is included automatically
+
+# Verify
+nerdctl version
+```
+
+---
+
 ## Building and Running Home Note
 
 ### Using Auto-Detection Scripts (Recommended)
@@ -141,9 +229,12 @@ The repository includes scripts that automatically detect your container runtime
 These scripts work with:
 - Docker
 - Podman
+- Finch
+- nerdctl (via Lima or Rancher Desktop)
 - OrbStack (uses Docker CLI)
-- Rancher Desktop (uses Docker CLI)
+- Rancher Desktop (uses Docker CLI or nerdctl)
 - Colima (uses Docker CLI)
+- Lima (uses nerdctl)
 
 ---
 
@@ -202,17 +293,66 @@ docker run -d -p 8080:8080 --name home-note-app home-note:latest
 
 ---
 
+### Using Finch (AWS)
+
+```bash
+# Build the image
+finch build -t home-note:latest .
+
+# Run the container
+finch run -d \
+    --name home-note-app \
+    -p 8080:8080 \
+    home-note:latest
+
+# View logs
+finch logs -f home-note-app
+
+# Stop the container
+finch stop home-note-app
+
+# Remove the container
+finch rm home-note-app
+```
+
+---
+
+### Using Lima + nerdctl
+
+```bash
+# Build the image
+lima nerdctl build -t home-note:latest .
+
+# Run the container
+lima nerdctl run -d \
+    --name home-note-app \
+    -p 8080:8080 \
+    home-note:latest
+
+# View logs
+lima nerdctl logs -f home-note-app
+
+# Stop the container
+lima nerdctl stop home-note-app
+
+# Remove the container
+lima nerdctl rm home-note-app
+```
+
+---
+
 ## Platform-Specific Notes
 
 ### macOS (Apple Silicon M1/M2/M3)
 
 All options work on Apple Silicon:
 
-**Podman** (Recommended):
+**Finch** (AWS - Native Apple Silicon) ⭐ NEW:
 ```bash
-brew install podman
-podman machine init --cpus 2 --memory 4096
-podman machine start
+brew install finch
+finch vm init
+finch vm start
+# Native performance, no emulation needed
 ```
 
 **OrbStack** (Fastest):
@@ -220,7 +360,21 @@ podman machine start
 - Fastest startup time
 - Uses minimal resources
 
-**Colima**:
+**Lima** (Most Control) ⭐ NEW:
+```bash
+brew install lima nerdctl
+limactl start
+# Direct access to VM for advanced configurations
+```
+
+**Podman** (Most Compatible):
+```bash
+brew install podman
+podman machine init --cpus 2 --memory 4096
+podman machine start
+```
+
+**Colima** (Lightweight):
 ```bash
 brew install colima docker
 colima start --cpu 2 --memory 4 --arch aarch64
@@ -252,13 +406,16 @@ sudo apt-get install -y podman
 
 ## Comparison Table
 
-| Runtime | macOS | Windows | Linux | Free | GUI | Rootless |
-|---------|-------|---------|-------|------|-----|----------|
-| Podman | ✅ | ✅ | ✅ | ✅ | Optional | ✅ |
-| OrbStack | ✅ | ❌ | ❌ | ✅* | ✅ | ✅ |
-| Rancher Desktop | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Colima | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| Docker Desktop | ✅ | ✅ | ✅ | ❌** | ✅ | ❌ |
+| Runtime | macOS | Windows | Linux | Free | GUI | Rootless | Apple Silicon |
+|---------|-------|---------|-------|------|-----|----------|---------------|
+| Podman | ✅ | ✅ | ✅ | ✅ | Optional | ✅ | ✅ |
+| OrbStack | ✅ | ❌ | ❌ | ✅* | ✅ | ✅ | ✅ (Native) |
+| Rancher Desktop | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Colima | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ |
+| Finch | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ (Native) |
+| Lima | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| nerdctl | ✅ | ❌ | ✅ | ✅ | Via RD | ✅ | ✅ |
+| Docker Desktop | ✅ | ✅ | ✅ | ❌** | ✅ | ❌ | ✅ |
 
 \* Free for personal use  
 \** Requires license for commercial use in larger companies
@@ -379,13 +536,16 @@ podman build --layers -t home-note:latest .
 
 ### macOS (Apple Silicon)
 1. **First choice**: OrbStack (fastest, easiest)
-2. **Second choice**: Podman (most compatible)
-3. **Third choice**: Colima (lightweight)
+2. **Second choice**: Finch (AWS, native Apple Silicon) ⭐ NEW
+3. **Third choice**: Lima (most control) ⭐ NEW
+4. **Fourth choice**: Podman (most compatible)
+5. **Fifth choice**: Colima (lightweight)
 
 ### macOS (Intel)
 1. **First choice**: Podman
-2. **Second choice**: Colima
-3. **Third choice**: OrbStack
+2. **Second choice**: Lima ⭐ NEW
+3. **Third choice**: Colima
+4. **Fourth choice**: OrbStack
 
 ### Windows 11
 1. **First choice**: Podman with Podman Desktop
@@ -405,6 +565,9 @@ podman build --layers -t home-note:latest .
 - **OrbStack**: https://orbstack.dev/
 - **Rancher Desktop**: https://rancherdesktop.io/
 - **Colima**: https://github.com/abiosoft/colima
+- **Finch**: https://github.com/runfinch/finch ⭐ NEW
+- **Lima**: https://github.com/lima-vm/lima ⭐ NEW
+- **nerdctl**: https://github.com/containerd/nerdctl ⭐ NEW
 
 ---
 

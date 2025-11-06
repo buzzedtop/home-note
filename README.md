@@ -44,17 +44,21 @@ flutter build web
 
 **Using Auto-Detection Scripts (Recommended):**
 ```bash
-# Works with Docker, Podman, OrbStack, Rancher Desktop, Colima
+# Works with Docker, Podman, Finch, nerdctl, OrbStack, Rancher Desktop, Colima, Lima
 ./build-container.sh
 ./run-container.sh
 ```
 
-**Using Docker/Podman directly:**
+**Using Docker/Podman/Finch directly:**
 ```bash
-# Build the Docker image
+# Build the image
 docker build -t home-note .
 # Or with Podman
 podman build -t home-note .
+# Or with Finch (AWS)
+finch build -t home-note .
+# Or with Lima + nerdctl
+lima nerdctl build -t home-note .
 
 # Run the container on port 8080
 docker run -p 8080:8080 home-note

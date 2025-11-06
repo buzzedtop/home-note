@@ -1,5 +1,5 @@
 # Build script for Windows PowerShell
-# Compatible with Docker, Podman, and other container runtimes
+# Compatible with Docker, Podman, Finch, nerdctl, and other container runtimes
 
 $ErrorActionPreference = "Stop"
 
@@ -7,11 +7,15 @@ $ErrorActionPreference = "Stop"
 $runtime = $null
 if (Get-Command podman -ErrorAction SilentlyContinue) {
     $runtime = "podman"
+} elseif (Get-Command finch -ErrorAction SilentlyContinue) {
+    $runtime = "finch"
+} elseif (Get-Command nerdctl -ErrorAction SilentlyContinue) {
+    $runtime = "nerdctl"
 } elseif (Get-Command docker -ErrorAction SilentlyContinue) {
     $runtime = "docker"
 } else {
     Write-Host "Error: No container runtime found." -ForegroundColor Red
-    Write-Host "Please install one of: Docker, Podman, or Rancher Desktop"
+    Write-Host "Please install one of: Docker, Podman, Finch, or Rancher Desktop"
     Write-Host "See CONTAINER_SETUP.md for installation instructions"
     exit 1
 }
