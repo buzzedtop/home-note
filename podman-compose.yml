@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  home-note:
+    build: .
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    container_name: home-note-app
+    # Podman-specific options (also compatible with Docker)
+    security_opt:
+      - no-new-privileges:true
+    # Works with rootless Podman
+    userns_mode: "keep-id"
