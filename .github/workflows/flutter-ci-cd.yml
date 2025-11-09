@@ -58,7 +58,7 @@ jobs:
         run: flutter pub get
       
       - name: Build for web
-        run: flutter build web --release --base-href /home-note/
+        run: flutter build web --no-tree-shake-icons --release --base-href /home-note/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
