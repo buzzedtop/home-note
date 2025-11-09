@@ -219,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.arrow_upward),
+                                icon: FaIcon(FontAwesomeIcons.chevron-up), 
                                 onPressed: index > 0
                                     ? () => _moveNoteUp(index)
                                     : null,
