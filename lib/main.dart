@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -219,14 +219,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: FaIcon(FontAwesomeIcons.chevron-up), 
+                                icon: const Icon(Bootstrap.arrow_up_circle_fill), 
                                 onPressed: index > 0
                                     ? () => _moveNoteUp(index)
                                     : null,
                                 tooltip: 'Move up',
                               ),
                               IconButton(
-                                icon: const Icon(Icons.arrow_downward),
+                                icon: const Icon(Bootstrap.arrow_down_circle_fill),
                                 onPressed: index < _notes.length - 1
                                     ? () => _moveNoteDown(index)
                                     : null,
