@@ -75,4 +75,18 @@ void main() {
     // Verify close button exists
     expect(find.text('Close'), findsOneWidget);
   });
+
+  testWidgets('App should show login button when not signed in', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    // Verify login button is visible
+    expect(find.text('Login'), findsOneWidget);
+    expect(find.byIcon(Icons.login), findsOneWidget);
+    
+    // Verify cloud buttons are not visible when not signed in
+    expect(find.byIcon(Icons.cloud_download), findsNothing);
+    expect(find.byIcon(Icons.cloud_upload), findsNothing);
+    expect(find.byIcon(Icons.logout), findsNothing);
+  });
 }

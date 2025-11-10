@@ -14,6 +14,8 @@ A simple Flutter application designed to track notes with drag-and-drop reorderi
 - Up/Down arrow buttons for manual reordering
 - Delete button for each note
 - Persistent storage using shared_preferences
+- **Google Sign-In with Drive integration** for cloud backup
+- Automatic sync to Google Drive when signed in
 - Cross-platform support (Web, iOS, Android, Desktop)
 - Docker containerization for web deployment
 - Python processing examples for future integration
@@ -23,8 +25,11 @@ Notes are stored using `shared_preferences` which provides cross-platform persis
 - Web: Browser localStorage
 - Mobile: Native platform storage (SharedPreferences/NSUserDefaults)
 - Desktop: Platform-appropriate storage
+- **Google Drive**: Cloud backup when signed in with Google (optional)
 - Easy processing with Python scripts
 - Simple database integration in the future
+
+📦 **[Google Drive Setup Guide](GOOGLE_DRIVE_SETUP.md)**: Configure Google OAuth for cloud backup
 
 ## Running the Application
 

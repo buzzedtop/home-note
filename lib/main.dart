@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -53,11 +57,30 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _textController = TextEditingController();
   List<Note> _notes = [];
   final ScrollController _scrollController = ScrollController();
+  
+  // Google Sign-In and Drive
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      drive.DriveApi.driveFileScope,
+    ],
+  );
+  GoogleSignInAccount? _currentUser;
+  bool _isLoadingDrive = false;
+  static const String _driveFileName = 'home_note_data.json';
 
   @override
   void initState() {
     super.initState();
     _loadNotes();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
+      setState(() {
+        _currentUser = account;
+      });
+      if (account != null) {
+        _loadNotesFromDrive();
+      }
+    });
+    _googleSignIn.signInSilently();
   }
 
   @override
@@ -91,6 +114,11 @@ class _MyHomePageState extends State<MyHomePage> {
       final jsonData = _notes.map((note) => note.toJson()).toList();
       final jsonString = json.encode(jsonData);
       await prefs.setString('notes', jsonString);
+      
+      // Also save to Google Drive if signed in
+      if (_currentUser != null) {
+        _saveNotesToDrive();
+      }
     } catch (e) {
       // Handle error
       if (mounted) {
@@ -99,6 +127,152 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       }
     }
+  }
+
+  Future<void> _saveNotesToDrive() async {
+    if (_currentUser == null) return;
+    
+    try {
+      setState(() {
+        _isLoadingDrive = true;
+      });
+
+      final httpClient = (await _googleSignIn.authenticatedClient())!;
+      final driveApi = drive.DriveApi(httpClient);
+
+      final jsonData = _notes.map((note) => note.toJson()).toList();
+      final jsonString = json.encode(jsonData);
+      
+      // Search for existing file
+      final fileList = await driveApi.files.list(
+        q: "name='$_driveFileName' and trashed=false",
+        spaces: 'drive',
+        $fields: 'files(id, name)',
+      );
+
+      final fileContent = jsonString.codeUnits;
+      final media = drive.Media(
+        Stream.value(fileContent),
+        fileContent.length,
+      );
+
+      if (fileList.files != null && fileList.files!.isNotEmpty) {
+        // Update existing file
+        final fileId = fileList.files!.first.id!;
+        await driveApi.files.update(
+          drive.File(),
+          fileId,
+          uploadMedia: media,
+        );
+      } else {
+        // Create new file
+        final driveFile = drive.File()
+          ..name = _driveFileName
+          ..mimeType = 'application/json';
+        
+        await driveApi.files.create(
+          driveFile,
+          uploadMedia: media,
+        );
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Notes saved to Google Drive')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving to Drive: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoadingDrive = false;
+      });
+    }
+  }
+
+  Future<void> _loadNotesFromDrive() async {
+    if (_currentUser == null) return;
+    
+    try {
+      setState(() {
+        _isLoadingDrive = true;
+      });
+
+      final httpClient = (await _googleSignIn.authenticatedClient())!;
+      final driveApi = drive.DriveApi(httpClient);
+
+      // Search for the file
+      final fileList = await driveApi.files.list(
+        q: "name='$_driveFileName' and trashed=false",
+        spaces: 'drive',
+        $fields: 'files(id, name)',
+      );
+
+      if (fileList.files != null && fileList.files!.isNotEmpty) {
+        final fileId = fileList.files!.first.id!;
+        
+        // Download file content
+        final response = await driveApi.files.get(
+          fileId,
+          downloadOptions: drive.DownloadOptions.fullMedia,
+        ) as drive.Media;
+
+        final dataBytes = <int>[];
+        await for (var chunk in response.stream) {
+          dataBytes.addAll(chunk);
+        }
+        
+        final jsonString = utf8.decode(dataBytes);
+        final List<dynamic> jsonData = json.decode(jsonString);
+        
+        setState(() {
+          _notes = jsonData.map((item) => Note.fromJson(item)).toList();
+        });
+        
+        // Also save to local storage
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('notes', jsonString);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Notes loaded from Google Drive')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading from Drive: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoadingDrive = false;
+      });
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      await _googleSignIn.signIn();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error signing in: $error')),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleGoogleSignOut() async {
+    await _googleSignIn.signOut();
+    setState(() {
+      _currentUser = null;
+    });
   }
 
   void _addNote() {
@@ -163,7 +337,8 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  // Google login functionality placeholder
+                  Navigator.of(context).pop();
+                  _handleGoogleSignIn();
                 },
                 icon: const Icon(Bootstrap.google),
                 label: const Text('Continue with Google'),
@@ -215,11 +390,43 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
-          TextButton.icon(
-            onPressed: _showLoginDialog,
-            icon: const Icon(Icons.login, color: Colors.white),
-            label: const Text('Login', style: TextStyle(color: Colors.white)),
-          ),
+          if (_isLoadingDrive)
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+            ),
+          if (_currentUser != null) ...[
+            IconButton(
+              onPressed: _loadNotesFromDrive,
+              icon: const Icon(Icons.cloud_download, color: Colors.white),
+              tooltip: 'Load from Google Drive',
+            ),
+            IconButton(
+              onPressed: _saveNotesToDrive,
+              icon: const Icon(Icons.cloud_upload, color: Colors.white),
+              tooltip: 'Save to Google Drive',
+            ),
+            TextButton.icon(
+              onPressed: _handleGoogleSignOut,
+              icon: const Icon(Icons.logout, color: Colors.white),
+              label: Text(
+                _currentUser!.displayName ?? _currentUser!.email ?? 'User',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ] else
+            TextButton.icon(
+              onPressed: _showLoginDialog,
+              icon: const Icon(Icons.login, color: Colors.white),
+              label: const Text('Login', style: TextStyle(color: Colors.white)),
+            ),
           const SizedBox(width: 8),
         ],
       ),
