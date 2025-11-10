@@ -59,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   
   // Google Sign-In and Drive
   final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: '987916681855-mug6io5bitt96j38e6h8ld8fdn5oj56f.apps.googleusercontent.com',
     scopes: [
       drive.DriveApi.driveFileScope,
     ],
