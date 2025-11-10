@@ -143,6 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Authentication failed. Please sign in again.')),
           );
+          setState(() {
+            _isLoadingDrive = false;
+          });
         }
         return;
       }
@@ -216,6 +219,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Authentication failed. Please sign in again.')),
           );
+          setState(() {
+            _isLoadingDrive = false;
+          });
         }
         return;
       }
