@@ -5,7 +5,6 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -417,7 +416,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: _handleGoogleSignOut,
               icon: const Icon(Icons.logout, color: Colors.white),
               label: Text(
-                _currentUser!.displayName ?? _currentUser!.email ?? 'User',
+                _currentUser?.displayName ?? _currentUser?.email ?? 'User',
                 style: const TextStyle(color: Colors.white),
               ),
             ),
