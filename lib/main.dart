@@ -137,7 +137,15 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoadingDrive = true;
       });
 
-      final httpClient = (await _googleSignIn.authenticatedClient())!;
+      final httpClient = await _googleSignIn.authenticatedClient();
+      if (httpClient == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Authentication failed. Please sign in again.')),
+          );
+        }
+        return;
+      }
       final driveApi = drive.DriveApi(httpClient);
 
       final jsonData = _notes.map((note) => note.toJson()).toList();
@@ -202,7 +210,15 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoadingDrive = true;
       });
 
-      final httpClient = (await _googleSignIn.authenticatedClient())!;
+      final httpClient = await _googleSignIn.authenticatedClient();
+      if (httpClient == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Authentication failed. Please sign in again.')),
+          );
+        }
+        return;
+      }
       final driveApi = drive.DriveApi(httpClient);
 
       // Search for the file
