@@ -57,14 +57,22 @@ void main() {
     expect(find.byIcon(Icons.login), findsOneWidget);
   });
 
-  testWidgets('Login button should show placeholder message when tapped', (WidgetTester tester) async {
+  testWidgets('Login button should show login dialog when tapped', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
     // Tap the login button
     await tester.tap(find.text('Login'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    // Verify the snackbar message appears
-    expect(find.text('Login functionality coming soon'), findsOneWidget);
+    // Verify the dialog appears with title
+    expect(find.text('Login'), findsNWidgets(2)); // One in AppBar, one in dialog title
+
+    // Verify all three provider buttons exist
+    expect(find.text('Continue with Google'), findsOneWidget);
+    expect(find.text('Continue with Microsoft'), findsOneWidget);
+    expect(find.text('Continue with Apple'), findsOneWidget);
+
+    // Verify close button exists
+    expect(find.text('Close'), findsOneWidget);
   });
 }

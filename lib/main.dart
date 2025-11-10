@@ -152,6 +152,62 @@ class _MyHomePageState extends State<MyHomePage> {
     _saveNotes();
   }
 
+  void _showLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Google login functionality placeholder
+                },
+                icon: const Icon(Bootstrap.google),
+                label: const Text('Continue with Google'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Microsoft login functionality placeholder
+                },
+                icon: const Icon(Bootstrap.microsoft),
+                label: const Text('Continue with Microsoft'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Apple login functionality placeholder
+                },
+                icon: const Icon(Bootstrap.apple),
+                label: const Text('Continue with Apple'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,12 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           TextButton.icon(
-            onPressed: () {
-              // Login functionality placeholder
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Login functionality coming soon')),
-              );
-            },
+            onPressed: _showLoginDialog,
             icon: const Icon(Icons.login, color: Colors.white),
             label: const Text('Login', style: TextStyle(color: Colors.white)),
           ),
