@@ -46,4 +46,25 @@ void main() {
     expect(noteFromJson.id, '123');
     expect(noteFromJson.content, 'Test content');
   });
+
+  testWidgets('App should have a login button in the top right', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    // Verify login button text exists
+    expect(find.text('Login'), findsOneWidget);
+
+    // Verify login icon exists
+    expect(find.byIcon(Icons.login), findsOneWidget);
+  });
+
+  testWidgets('Login button should show placeholder message when tapped', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    // Tap the login button
+    await tester.tap(find.text('Login'));
+    await tester.pump();
+
+    // Verify the snackbar message appears
+    expect(find.text('Login functionality coming soon'), findsOneWidget);
+  });
 }

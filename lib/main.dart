@@ -158,6 +158,19 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              // Login functionality placeholder
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Login functionality coming soon')),
+              );
+            },
+            icon: const Icon(Icons.login, color: Colors.white),
+            label: const Text('Login', style: TextStyle(color: Colors.white)),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Column(
         children: [
