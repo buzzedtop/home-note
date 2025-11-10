@@ -417,7 +417,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: _handleGoogleSignOut,
               icon: const Icon(Icons.logout, color: Colors.white),
               label: Text(
-                _currentUser!.displayName ?? _currentUser!.email,
+                _currentUser!.displayName ?? _currentUser!.email ?? 'User',
                 style: const TextStyle(color: Colors.white),
               ),
             ),
