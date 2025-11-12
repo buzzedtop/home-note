@@ -31,6 +31,8 @@ Notes are stored using `shared_preferences` which provides cross-platform persis
 
 📦 **[Google Drive Setup Guide](GOOGLE_DRIVE_SETUP.md)**: Configure Google OAuth for cloud backup
 
+⚠️ **Getting "Access Blocked" Error?** See the [Google Drive Setup Guide](GOOGLE_DRIVE_SETUP.md#️-important-fixing-access-blocked-error) for quick fixes.
+
 ## Running the Application
 
 ### Local Development
@@ -88,7 +90,9 @@ Access the application at `http://localhost:8080`
 - Advanced note features (categories, search, etc.)
 
 ## Documentation
+- **[Troubleshooting Guide](TROUBLESHOOTING.md)**: Quick fixes for common issues
 - **[Getting Started Guide](GETTING_STARTED.md)**: Detailed setup and usage instructions
+- **[Google Drive Setup](GOOGLE_DRIVE_SETUP.md)**: Configure Google OAuth for cloud backup
 - **[Architecture Documentation](ARCHITECTURE.md)**: Technical design and implementation details
 - **[UI Design](UI_DESIGN.md)**: Interface layout and interaction patterns
 - **[Deployment Guide](DEPLOYMENT.md)**: GitHub Actions CI/CD and GitHub Pages setup

@@ -141,7 +141,10 @@ class _MyHomePageState extends State<MyHomePage> {
       if (httpClient == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Authentication failed. Please sign in again.')),
+            const SnackBar(
+              content: Text('Authorization failed. Please sign in again. If the problem persists, see TROUBLESHOOTING.md'),
+              duration: Duration(seconds: 5),
+            ),
           );
           setState(() {
             _isLoadingDrive = false;
@@ -217,7 +220,10 @@ class _MyHomePageState extends State<MyHomePage> {
       if (httpClient == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Authentication failed. Please sign in again.')),
+            const SnackBar(
+              content: Text('Authorization failed. Please sign in again. If the problem persists, see TROUBLESHOOTING.md'),
+              duration: Duration(seconds: 5),
+            ),
           );
           setState(() {
             _isLoadingDrive = false;
@@ -284,7 +290,10 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error signing in: $error')),
+          SnackBar(
+            content: Text('Error signing in: $error. See TROUBLESHOOTING.md for help.'),
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
     }
