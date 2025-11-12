@@ -37,17 +37,40 @@ Quick reference for common issues with Home Note.
 
 **Causes & Solutions**:
 
-1. **Not added as test user** (if app is in Testing mode)
-   - Follow Option 1 or 2 above
+1. **App is published but still failing**
+   - **Wait 5-10 minutes** after publishing - changes can take time to propagate
+   - **Clear browser cache completely**:
+     - Chrome: Settings → Privacy → Clear browsing data → Cached images and Cookies
+     - Firefox: Settings → Privacy → Clear Data → Cookies and Cache
+   - **Sign out from Google completely** in your browser, then sign in again to the app
+   - **Check authorized redirect URIs** (common issue):
+     - Go to: **APIs & Services** → **Credentials** → Your OAuth Client
+     - Under "Authorized redirect URIs", you should have:
+       - `https://buzzedtop.github.io/home-note` (with the path)
+     - Under "Authorized JavaScript origins", you should have:
+       - `https://buzzedtop.github.io` (without the path)
+     - If these are incorrect, update them and wait 5 minutes
 
-2. **Expired credentials**
+2. **Not added as test user** (if app is in Testing mode)
+   - Follow Option 1 or 2 above to publish or add test users
+
+3. **Expired credentials**
    - Sign out (click your name → sign out)
    - Clear browser cache for the site
    - Sign in again
 
-3. **Wrong scopes configured**
+4. **Wrong scopes configured**
    - Verify `https://www.googleapis.com/auth/drive.file` is added in OAuth consent screen
-   - Check the scope in your code matches
+   - Go to: **APIs & Services** → **OAuth consent screen** → Edit App
+   - Click through to the "Scopes" section
+   - Ensure the Drive File scope is listed
+   - If you added it recently, it can take a few minutes to activate
+
+5. **Google Drive API not enabled**
+   - Go to: **APIs & Services** → **Library**
+   - Search for "Google Drive API"
+   - It should show "MANAGE" (not "ENABLE")
+   - If it shows "ENABLE", click it to enable the API
 
 ---
 
@@ -118,6 +141,61 @@ Quick reference for common issues with Home Note.
 2. Hard refresh: `Ctrl+F5` (Windows) or `Cmd+Shift+R` (Mac)
 3. Clear browser cache
 4. Check [GitHub Actions](https://github.com/buzzedtop/home-note/actions) for deployment status
+
+---
+
+### 🟡 Still Having Issues After Publishing?
+
+If you've published the app and are still getting authentication errors, follow this systematic debugging checklist:
+
+**Step 1: Verify Publishing Status**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to: **APIs & Services** → **OAuth consent screen**
+3. Check "Publishing status" at the top - should say "In production"
+4. If it says "Testing", click "Publish App"
+
+**Step 2: Verify API is Enabled**
+1. Go to: **APIs & Services** → **Library**
+2. Search for "Google Drive API"
+3. Click on it - should show "API enabled" with a "MANAGE" button
+4. If you see "ENABLE" instead, click it to enable
+
+**Step 3: Verify OAuth Credentials** (MOST COMMON ISSUE)
+1. Go to: **APIs & Services** → **Credentials**
+2. Click on your OAuth 2.0 Client ID
+3. Check **Authorized JavaScript origins**:
+   - Must include: `https://buzzedtop.github.io`
+   - For local testing: `http://localhost:8080`
+4. Check **Authorized redirect URIs**:
+   - Must include: `https://buzzedtop.github.io/home-note`
+   - For local testing: `http://localhost:8080`
+5. If any are missing or wrong, update and click "SAVE"
+6. **Wait 5-10 minutes** after saving for changes to propagate
+
+**Step 4: Verify Scopes**
+1. Go to: **APIs & Services** → **OAuth consent screen**
+2. Click "Edit App"
+3. Navigate to "Scopes" section
+4. Ensure `https://www.googleapis.com/auth/drive.file` is listed
+5. If missing, add it and save
+
+**Step 5: Clear Everything and Retry**
+1. Clear browser cache completely
+2. Sign out from Google in your browser (go to google.com and sign out)
+3. Close all browser tabs
+4. Open a new browser tab
+5. Go to your app URL
+6. Try signing in again
+
+**Step 6: Check Browser Console**
+1. Open browser console (F12 or Right-click → Inspect)
+2. Go to "Console" tab
+3. Try signing in
+4. Look for error messages (usually in red)
+5. Common errors and meanings:
+   - `redirect_uri_mismatch`: Your redirect URIs in Step 3 are wrong
+   - `invalid_client`: Your Client ID doesn't match
+   - `access_denied`: Publishing or scopes issue (check Steps 1 & 4)
 
 ---
 

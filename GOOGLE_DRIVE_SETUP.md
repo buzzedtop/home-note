@@ -181,17 +181,23 @@ This error occurs when your OAuth consent screen is in **Testing** mode and the 
 This error appears after signing in when the app cannot obtain an authenticated HTTP client.
 
 **Common Causes:**
-1. **Testing Mode without Test User**: See "Error 403" solution above
-2. **Expired Credentials**: Sign out completely and sign in again
-3. **Scope Mismatch**: Ensure the same scopes are configured in both:
-   - Google Cloud Console OAuth consent screen
-   - The application code (currently uses `drive.file` scope)
+1. **App just published**: Changes can take 5-10 minutes to propagate. Clear browser cache, sign out from Google completely, and try again.
+2. **Incorrect redirect URIs**: The most common issue after publishing. Verify:
+   - **Authorized JavaScript origins**: `https://buzzedtop.github.io` (no path)
+   - **Authorized redirect URIs**: `https://buzzedtop.github.io/home-note` (with path)
+   - Go to **APIs & Services** → **Credentials** → Your OAuth Client to check/update
+3. **Testing Mode without Test User**: See "Error 403" solution above
+4. **Google Drive API not enabled**: Go to **APIs & Services** → **Library** → Search "Google Drive API" → Should show "MANAGE"
+5. **Wrong scopes**: Verify `https://www.googleapis.com/auth/drive.file` is added in OAuth consent screen
+6. **Expired Credentials**: Sign out completely and sign in again
 
 **Steps to Fix:**
-1. Sign out from the app (click your name in top-right, then sign out)
-2. Clear your browser cache and cookies for the site
-3. Ensure you're added as a test user (if in Testing mode) or app is published
-4. Sign in again
+1. **Verify authorized URIs** (most important - see cause #2 above)
+2. **Clear browser cache completely** (Settings → Privacy → Clear browsing data → Cookies and Cache)
+3. **Sign out from Google** in your browser (google.com → sign out)
+4. **Wait 5-10 minutes** after making any changes in Google Cloud Console
+5. **Sign in again** to the app
+6. If still failing, check browser console (F12) for specific error messages
 
 ### "Sign-in failed" error
 - Verify your Client ID is correctly configured in `web/index.html`
