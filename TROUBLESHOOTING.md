@@ -74,6 +74,27 @@ Quick reference for common issues with Home Note.
 
 ---
 
+### 🔴 "People API has not been used" or "People API is disabled"
+
+**Problem**: After signing in, you see an error about "People API has not been used in project" or "SERVICE_DISABLED".
+
+**Root Cause**: Google Sign-In requires the People API to retrieve user profile information (name, email), but it's not enabled in your Google Cloud project.
+
+**Solution**:
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to: **APIs & Services** → **Library**
+3. Search for "People API"
+4. Click on "People API" in the results
+5. Click the **"ENABLE"** button
+6. Wait 2-3 minutes for the API to activate
+7. Clear browser cache and try signing in again
+
+**Note**: You need **both** Google Drive API and People API enabled for this app to work:
+- **Google Drive API**: For saving/loading notes to Google Drive
+- **People API**: For Google Sign-In to retrieve your name and email
+
+---
+
 ### 🔴 "Sign-in failed"
 
 **Problem**: The sign-in popup doesn't work or fails immediately.
@@ -154,11 +175,15 @@ If you've published the app and are still getting authentication errors, follow 
 3. Check "Publishing status" at the top - should say "In production"
 4. If it says "Testing", click "Publish App"
 
-**Step 2: Verify API is Enabled**
+**Step 2: Verify APIs are Enabled** (CRITICAL)
 1. Go to: **APIs & Services** → **Library**
 2. Search for "Google Drive API"
 3. Click on it - should show "API enabled" with a "MANAGE" button
 4. If you see "ENABLE" instead, click it to enable
+5. **IMPORTANT**: Also search for "People API"
+6. Click on "People API" - should show "API enabled"
+7. If "People API" shows "ENABLE", click it to enable (required for sign-in)
+8. Wait 2-3 minutes after enabling any API
 
 **Step 3: Verify OAuth Credentials** (MOST COMMON ISSUE)
 1. Go to: **APIs & Services** → **Credentials**

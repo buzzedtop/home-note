@@ -28,10 +28,11 @@ To enable Google Sign-In and Drive integration, you need to set up OAuth credent
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
-3. Enable the Google Drive API:
+3. Enable required APIs:
    - Go to "APIs & Services" > "Library"
-   - Search for "Google Drive API"
-   - Click "Enable"
+   - Search for "Google Drive API" and click "Enable"
+   - Search for "People API" and click "Enable" (required for Google Sign-In to retrieve user profile)
+   - Both APIs must be enabled for the application to work properly
 
 ### 2. Configure OAuth Consent Screen
 
@@ -45,6 +46,7 @@ To enable Google Sign-In and Drive integration, you need to set up OAuth credent
    - Click "Add or Remove Scopes"
    - Search for and select: `https://www.googleapis.com/auth/drive.file`
    - This scope allows the app to access files it creates (not all Drive files)
+   - **Note**: You only need `drive.file` scope. Do NOT add `drive.install` or other broader scopes unless specifically needed
    - Click "Update" to save the scopes
 5. **IMPORTANT**: Publishing Status
    - **Option A: Testing Mode** (Quick setup, limited access)
@@ -90,7 +92,8 @@ Replace `YOUR_ACTUAL_CLIENT_ID` with your actual Client ID from step 3.
 Before deploying, verify your OAuth configuration is correct:
 
 **Checklist:**
-- [ ] Google Drive API is enabled in your Google Cloud project
+- [ ] **Google Drive API** is enabled in your Google Cloud project
+- [ ] **People API** is enabled in your Google Cloud project (required for sign-in)
 - [ ] OAuth consent screen is configured with app name and contact emails
 - [ ] Scope `https://www.googleapis.com/auth/drive.file` is added
 - [ ] OAuth client ID is created for "Web application"
@@ -204,7 +207,9 @@ This error appears after signing in when the app cannot obtain an authenticated 
 - Check that your domain is listed in authorized JavaScript origins:
   - For local development: `http://localhost:8080`
   - For GitHub Pages: `https://buzzedtop.github.io`
-- Ensure Google Drive API is enabled in your project
+- **Ensure both required APIs are enabled** in your project:
+  - Google Drive API (for saving/loading notes)
+  - People API (for sign-in and user profile)
 - Check browser console (F12) for detailed error messages
 
 ### Notes not syncing
