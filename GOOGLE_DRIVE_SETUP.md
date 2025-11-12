@@ -2,6 +2,16 @@
 
 This guide explains how to configure Google Drive integration for saving and loading notes.
 
+## ⚠️ Important: Fixing "Access Blocked" Error
+
+If you're seeing **"Error 403: access_denied"** or **"Access Blocked: buzzedtop.github.io has not completed the Google verification process"**, this means your OAuth consent screen is in Testing mode. Jump to the [Troubleshooting](#troubleshooting) section below for quick fixes.
+
+**Quick Fix Options:**
+1. **Add yourself as a test user** in Google Cloud Console (fastest for personal use)
+2. **Publish your app to Production** (recommended for sharing with others)
+
+See [Troubleshooting](#troubleshooting) section for detailed instructions.
+
 ## Features
 
 When you sign in with Google, your notes will be:
@@ -32,8 +42,21 @@ To enable Google Sign-In and Drive integration, you need to set up OAuth credent
    - User support email: your email
    - Developer contact: your email
 4. Add scopes:
-   - `https://www.googleapis.com/auth/drive.file` (for accessing files created by the app)
-5. Add test users if in testing mode (your own email address)
+   - Click "Add or Remove Scopes"
+   - Search for and select: `https://www.googleapis.com/auth/drive.file`
+   - This scope allows the app to access files it creates (not all Drive files)
+   - Click "Update" to save the scopes
+5. **IMPORTANT**: Publishing Status
+   - **Option A: Testing Mode** (Quick setup, limited access)
+     - If you stay in "Testing" mode, only you and explicitly added test users can sign in
+     - Add test users by email address (your own email and any other users who need access)
+     - This is sufficient for personal use or small teams
+     - **Limitation**: Maximum of 100 test users, app shows "unverified" warning
+   - **Option B: Production Mode** (Recommended for public access)
+     - Click "Publish App" to make it available to all Google users
+     - For apps using only non-sensitive scopes like `drive.file`, no verification is required
+     - Users may see a warning that the app is "unverified" but can proceed by clicking "Advanced"
+     - To remove the warning, you can submit for verification (optional, takes 3-5 days)
 6. Save and continue
 
 ### 3. Create OAuth 2.0 Credentials
@@ -62,7 +85,29 @@ Edit `web/index.html` and replace the placeholder client ID:
 
 Replace `YOUR_ACTUAL_CLIENT_ID` with your actual Client ID from step 3.
 
-### 5. Rebuild and Deploy
+### 5. Verify Your Setup
+
+Before deploying, verify your OAuth configuration is correct:
+
+**Checklist:**
+- [ ] Google Drive API is enabled in your Google Cloud project
+- [ ] OAuth consent screen is configured with app name and contact emails
+- [ ] Scope `https://www.googleapis.com/auth/drive.file` is added
+- [ ] OAuth client ID is created for "Web application"
+- [ ] Authorized JavaScript origins include your deployment URL(s)
+- [ ] Authorized redirect URIs include your deployment URL(s)
+- [ ] **CRITICAL**: Either:
+  - [ ] Your email is added as a test user (if in Testing mode), OR
+  - [ ] App is published to Production
+- [ ] Client ID is updated in `web/index.html`
+
+**How to Check Publishing Status:**
+1. Go to "APIs & Services" > "OAuth consent screen"
+2. Look at the top of the page for "Publishing status"
+3. If it says "Testing" and you want others to access it, click "Publish App"
+4. If it says "In Production", you're all set!
+
+### 6. Rebuild and Deploy
 
 For local development:
 ```bash
@@ -107,16 +152,61 @@ When signed in, you'll see cloud buttons in the toolbar:
 
 ## Troubleshooting
 
+### "Error 403: access_denied" or "Access Blocked"
+This error occurs when your OAuth consent screen is in **Testing** mode and the user signing in is not added as a test user.
+
+**Solution 1: Add Test Users** (if staying in Testing mode)
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to "APIs & Services" > "OAuth consent screen"
+3. Scroll down to "Test users" section
+4. Click "Add Users"
+5. Enter the email address of each user who needs access
+6. Click "Save"
+7. Users can now sign in successfully
+
+**Solution 2: Publish to Production** (recommended for public access)
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to "APIs & Services" > "OAuth consent screen"
+3. Click "Publish App" button
+4. Confirm by clicking "Confirm" in the dialog
+5. Your app is now available to all Google users
+6. Note: Users may see an "unverified app" warning but can proceed by clicking "Advanced" > "Go to [App Name] (unsafe)"
+
+**To remove the "unverified" warning** (optional):
+- Submit your app for verification through the OAuth consent screen
+- This process typically takes 3-5 business days
+- Verification is not required for apps using only `drive.file` scope for personal/internal use
+
+### "Authorization Failed please sign in again"
+This error appears after signing in when the app cannot obtain an authenticated HTTP client.
+
+**Common Causes:**
+1. **Testing Mode without Test User**: See "Error 403" solution above
+2. **Expired Credentials**: Sign out completely and sign in again
+3. **Scope Mismatch**: Ensure the same scopes are configured in both:
+   - Google Cloud Console OAuth consent screen
+   - The application code (currently uses `drive.file` scope)
+
+**Steps to Fix:**
+1. Sign out from the app (click your name in top-right, then sign out)
+2. Clear your browser cache and cookies for the site
+3. Ensure you're added as a test user (if in Testing mode) or app is published
+4. Sign in again
+
 ### "Sign-in failed" error
 - Verify your Client ID is correctly configured in `web/index.html`
-- Check that your domain is listed in authorized JavaScript origins
+- Check that your domain is listed in authorized JavaScript origins:
+  - For local development: `http://localhost:8080`
+  - For GitHub Pages: `https://buzzedtop.github.io`
 - Ensure Google Drive API is enabled in your project
+- Check browser console (F12) for detailed error messages
 
 ### Notes not syncing
 - Check your internet connection
 - Verify you're signed in (your name should appear in the top-right)
 - Look for error messages in the snackbar at the bottom of the screen
 - Check browser console for detailed error messages
+- Ensure you have granted the app permission to access your Google Drive
 
 ### Using without Google Drive
 - The app works perfectly fine without signing in
