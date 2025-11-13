@@ -3,16 +3,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:home_note/main.dart';
 
 void main() {
-  testWidgets('App should have a title', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  // Helper function to properly initialize the app and wait for async operations
+  Future<void> pumpAppAndSettle(WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
+    // Wait for initial frame
+    await tester.pump();
+    // Wait for the delayed Google Sign-In attempt (500ms) plus a buffer
+    await tester.pump(const Duration(milliseconds: 600));
+    // Let all remaining async operations complete
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('App should have a title', (WidgetTester tester) async {
+    await pumpAppAndSettle(tester);
 
     // Verify that app title is present
     expect(find.text('Home Note'), findsOneWidget);
   });
 
   testWidgets('App should have an input field and add button', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await pumpAppAndSettle(tester);
 
     // Verify input field exists
     expect(find.byType(TextField), findsOneWidget);
@@ -22,14 +32,14 @@ void main() {
   });
 
   testWidgets('Adding a note should display it in the list', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await pumpAppAndSettle(tester);
 
     // Enter text in the text field
     await tester.enterText(find.byType(TextField), 'Test note');
 
     // Tap the add button
     await tester.tap(find.text('Add'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     // Verify the note appears in the list
     expect(find.text('Test note'), findsOneWidget);
@@ -48,7 +58,7 @@ void main() {
   });
 
   testWidgets('App should have a login button in the top right', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await pumpAppAndSettle(tester);
 
     // Verify login button text exists
     expect(find.text('Login'), findsOneWidget);
@@ -58,7 +68,7 @@ void main() {
   });
 
   testWidgets('Login button should show login dialog when tapped', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await pumpAppAndSettle(tester);
 
     // Tap the login button
     await tester.tap(find.text('Login'));
@@ -77,8 +87,7 @@ void main() {
   });
 
   testWidgets('App should show login button when not signed in', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
-    await tester.pumpAndSettle();
+    await pumpAppAndSettle(tester);
 
     // Verify login button is visible
     expect(find.text('Login'), findsOneWidget);
@@ -93,7 +102,8 @@ void main() {
   testWidgets('App should initialize properly with delayed Google Sign-In', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
     
-    // Initial state should show login button
+    // Initial state should show login button (before delay completes)
+    await tester.pump();
     expect(find.text('Login'), findsOneWidget);
     
     // Wait for the delayed signInSilently call (500ms)
