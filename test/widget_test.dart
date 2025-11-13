@@ -6,6 +6,7 @@ void main() {
   testWidgets('App should have a title', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
     // Verify that app title is present
     expect(find.text('Home Note'), findsOneWidget);
@@ -13,6 +14,7 @@ void main() {
 
   testWidgets('App should have an input field and add button', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
     // Verify input field exists
     expect(find.byType(TextField), findsOneWidget);
@@ -23,6 +25,7 @@ void main() {
 
   testWidgets('Adding a note should display it in the list', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
     // Enter text in the text field
     await tester.enterText(find.byType(TextField), 'Test note');
@@ -49,6 +52,7 @@ void main() {
 
   testWidgets('App should have a login button in the top right', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
     // Verify login button text exists
     expect(find.text('Login'), findsOneWidget);
@@ -59,6 +63,7 @@ void main() {
 
   testWidgets('Login button should show login dialog when tapped', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
     // Tap the login button
     await tester.tap(find.text('Login'));
