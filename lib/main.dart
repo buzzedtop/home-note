@@ -80,7 +80,10 @@ class _MyHomePageState extends State<MyHomePage> {
         _loadNotesFromDrive();
       }
     });
-    _googleSignIn.signInSilently();
+    // Delay to ensure Google Identity Services library is loaded
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _googleSignIn.signInSilently();
+    });
   }
 
   @override
