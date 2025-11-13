@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -81,8 +82,21 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     // Delay to ensure Google Identity Services library is loaded
-    Future.delayed(const Duration(milliseconds: 500), () {
-      _googleSignIn.signInSilently();
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      try {
+        // On web, One Tap doesn't work well with Drive API scopes
+        // Only attempt silent sign-in with suppressErrors to avoid One Tap prompt
+        if (kIsWeb) {
+          await _googleSignIn.signInSilently(suppressErrors: true);
+        } else {
+          // On mobile platforms, silent sign-in works normally
+          await _googleSignIn.signInSilently();
+        }
+      } catch (e) {
+        // Silent sign-in failed (expected for new users)
+        // User can still sign in manually via the Login button
+        debugPrint('Silent sign-in failed: $e');
+      }
     });
   }
 
