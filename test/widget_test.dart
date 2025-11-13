@@ -89,4 +89,20 @@ void main() {
     expect(find.byIcon(Icons.cloud_upload), findsNothing);
     expect(find.byIcon(Icons.logout), findsNothing);
   });
+
+  testWidgets('App should initialize properly with delayed Google Sign-In', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+    
+    // Initial state should show login button
+    expect(find.text('Login'), findsOneWidget);
+    
+    // Wait for the delayed signInSilently call (500ms)
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+    
+    // App should still be functional
+    expect(find.text('Home Note'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Add'), findsOneWidget);
+  });
 }
