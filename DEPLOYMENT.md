@@ -37,6 +37,11 @@ The workflow **does not deploy to GitHub Pages**.
 - Notes are stored in browser localStorage.
 - Google Drive integration still works when OAuth origins/redirect URIs match your Coolify domain.
 
+## Logs in Coolify
+
+- Nginx access and error logs are written to stdout/stderr, so Coolify can display them in the **Logs** tab.
+- For local troubleshooting, run: `docker compose logs -f home-note`.
+
 ## Google OAuth for Coolify Domain
 
 If using Google Sign-In, add your Coolify-hosted URL(s) in Google Cloud Console:
