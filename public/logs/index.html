@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deployment Logs - Home Note</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        background: #020617;
+        color: #e2e8f0;
+        margin: 0;
+        padding: 0;
+      }
+      main {
+        max-width: 860px;
+        margin: 8vh auto;
+        padding: 32px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid #1e293b;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+      }
+      h1 {
+        margin-top: 0;
+      }
+      .status {
+        padding: 16px;
+        border-radius: 12px;
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        margin-top: 16px;
+      }
+      .status strong {
+        color: #38bdf8;
+      }
+      a {
+        color: #38bdf8;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      pre {
+        background: #0b1120;
+        padding: 16px;
+        border-radius: 12px;
+        overflow-x: auto;
+        color: #cbd5f5;
+      }
+      .muted {
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Deployment verification logs</h1>
+      <p class="muted">
+        This page loads the latest GitHub Actions verification run so failures remain visible even if a new deploy fails.
+      </p>
+      <div id="status" class="status">Loading latest verification run…</div>
+      <pre id="details" hidden></pre>
+    </main>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const repo = params.get("repo") || "buzzedtop/home-note";
+      const workflowFile = "deployment-verification.yml";
+      const statusEl = document.getElementById("status");
+      const detailsEl = document.getElementById("details");
+
+      const format = (value) => (value ? new Date(value).toLocaleString() : "Unknown");
+
+      fetch(`https://api.github.com/repos/${repo}/actions/workflows/${workflowFile}/runs?per_page=1`, {
+        headers: {
+          Accept: "application/vnd.github+json",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`GitHub API returned ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const run = data.workflow_runs && data.workflow_runs[0];
+          if (!run) {
+            statusEl.textContent = "No verification runs found yet.";
+            return;
+          }
+
+          const conclusion = run.conclusion || "in_progress";
+          const statusLine = `Latest run: ${run.name} (#${run.run_number})`;
+          const detailLine = `${conclusion.toUpperCase()} · ${format(run.updated_at)}`;
+
+          statusEl.innerHTML = `
+            <strong>${statusLine}</strong><br />
+            ${detailLine}<br />
+            <a href="${run.html_url}" target="_blank" rel="noopener noreferrer">Open run in GitHub</a>
+          `;
+
+          detailsEl.hidden = false;
+          detailsEl.textContent = JSON.stringify(
+            {
+              status: run.status,
+              conclusion: run.conclusion,
+              run_number: run.run_number,
+              updated_at: run.updated_at,
+              html_url: run.html_url,
+            },
+            null,
+            2
+          );
+        })
+        .catch((error) => {
+          statusEl.textContent = `Unable to load verification status: ${error.message}`;
+        });
+    </script>
+  </body>
+</html>
