@@ -63,7 +63,8 @@
       <pre id="details" hidden></pre>
     </main>
     <script>
-      const repo = "buzzedtop/home-note";
+      const params = new URLSearchParams(window.location.search);
+      const repo = params.get("repo") || "buzzedtop/home-note";
       const workflowFile = "deployment-verification.yml";
       const statusEl = document.getElementById("status");
       const detailsEl = document.getElementById("details");

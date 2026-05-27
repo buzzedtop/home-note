@@ -13,4 +13,4 @@ printf "\nVerifying deployment at %s\n" "$TARGET"
 curl --fail --show-error --location --retry 3 --retry-delay 5 "$TARGET" > /tmp/home-note-root.html
 curl --fail --show-error --location --retry 3 --retry-delay 5 "$TARGET/logs" > /tmp/home-note-logs.html
 
-echo "\nVerification succeeded: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+printf "\nVerification succeeded: %s\n" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
