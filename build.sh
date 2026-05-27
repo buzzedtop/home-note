@@ -12,7 +12,7 @@ elif command -v docker &> /dev/null; then
 else
     echo "Error: No container runtime found."
     echo "Please install one of: Docker, Podman, OrbStack, Rancher Desktop, or Colima"
-    echo "See CONTAINER_SETUP.md for installation instructions"
+    echo "See README.md for setup instructions"
     exit 1
 fi
 
