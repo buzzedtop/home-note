@@ -5,7 +5,7 @@
 
 A simple Flutter application designed to track notes with drag-and-drop reordering
 
-🚀 **[Live Demo](https://buzzedtop.github.io/home-note/)** - Try it now on GitHub Pages!
+🚀 Deploy with Docker Compose (recommended for Coolify hosting)
 
 ## Features
 - Add notes with a paragraph text field
@@ -91,5 +91,5 @@ Access the application at `http://localhost:8080`
 - **[Getting Started Guide](GETTING_STARTED.md)**: Detailed setup and usage instructions
 - **[Architecture Documentation](ARCHITECTURE.md)**: Technical design and implementation details
 - **[UI Design](UI_DESIGN.md)**: Interface layout and interaction patterns
-- **[Deployment Guide](DEPLOYMENT.md)**: GitHub Actions CI/CD and GitHub Pages setup
+- **[Deployment Guide](DEPLOYMENT.md)**: Coolify + Docker Compose deployment setup
 - **[Python Example](example_processor.py)**: Sample script for note processing

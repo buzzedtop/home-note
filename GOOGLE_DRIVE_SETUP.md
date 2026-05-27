@@ -43,12 +43,12 @@ To enable Google Sign-In and Drive integration, you need to set up OAuth credent
 3. Choose "Web application"
 4. Add authorized JavaScript origins:
    - `http://localhost:8080` (for local development)
-   - `https://buzzedtop.github.io` (for GitHub Pages)
-   - Add your custom domain if you have one
+   - `https://your-domain.example` (your Coolify production domain)
+   - Add additional domains as needed
 5. Add authorized redirect URIs:
    - `http://localhost:8080` (for local development)
-   - `https://buzzedtop.github.io/home-note` (for GitHub Pages)
-   - Add your custom domain if you have one
+   - `https://your-domain.example` (your Coolify production domain)
+   - Add additional domains as needed
 6. Click "Create"
 7. Copy the Client ID (looks like: `xxxxx.apps.googleusercontent.com`)
 
